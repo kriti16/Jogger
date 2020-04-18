@@ -1,7 +1,7 @@
 from flask import jsonify, make_response, request
 from flask_restful import Resource
-from database.models import Record
-from database.db import db
+from app.database.models import Record
+from app.database.db import db
 
 class RecordsApi(Resource):
 	def get(self):
