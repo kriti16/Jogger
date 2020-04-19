@@ -1,5 +1,6 @@
 from .db import db
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
+from app.weather import get_weather_data
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +38,7 @@ class Record(db.Model):
 	time = db.Column(db.String(8))	# 12:00:00
 	latitude = db.Column(db.Float)
 	longitude = db.Column(db.Float)
+	weather = db.Column(db.String(100))
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 	def to_dict(self):
@@ -47,6 +49,7 @@ class Record(db.Model):
 			'time': self.time,
 			'latitude': self.latitude,
 			'longitude': self.longitude,
+			'weather': self.weather,
 			'user_id': self.user_id
 		}
 		return data
@@ -57,6 +60,7 @@ class Record(db.Model):
 				setattr(self, key, data[key])
 		if 'user_id' in data:
 			self.runner = User.query.get(data['user_id']);
+		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.time)
 
 	def to_dict_collection(records):
 		data = {
