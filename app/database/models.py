@@ -1,5 +1,5 @@
 from .db import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.weather import get_weather_data
 
 class User(db.Model):
@@ -10,6 +10,9 @@ class User(db.Model):
 
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
+
+	def check_password(self, password):
+		return check_password_hash(self.password_hash, password)
 
 	def to_dict(self):
 		data = {
@@ -30,6 +33,9 @@ class User(db.Model):
 			'items':[u.to_dict() for u in users]
 		}
 		return data
+
+	def find_by_username(username):
+		return User.query.filter_by(username = username).first()
 
 class Record(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
