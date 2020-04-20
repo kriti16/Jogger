@@ -19,3 +19,19 @@ class RecordsApi(Resource):
 		db.session.add(record)
 		db.session.commit()
 		return make_response(jsonify(id=record.id), 201)
+
+class RecordApi(Resource):
+	@jwt_required
+	def put(self, id):
+		data = request.get_json() or {}
+		record = Record.query.get(id)
+		record.update(data)
+		db.session.commit()
+		return make_response('', 200)
+
+	@jwt_required
+	def delete(self, id):
+		record = Record.query.get(id)
+		db.session.delete(record)
+		db.session.commit()
+		return make_response('', 200)

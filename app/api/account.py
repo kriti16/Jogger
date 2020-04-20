@@ -18,3 +18,19 @@ class UsersApi(Resource):
 		db.session.add(user)
 		db.session.commit()
 		return make_response(jsonify(user.to_dict()), 201)
+
+class UserApi(Resource):
+	@jwt_required
+	def put(self, id):
+		data = request.get_json() or {}
+		user = User.query.get(id)
+		user.update(data)
+		db.session.commit()
+		return make_response('', 200)
+
+	@jwt_required
+	def delete(self, id):
+		user = User.query.get(id)
+		db.session.delete(user)
+		db.session.commit()
+		return make_response('', 200)

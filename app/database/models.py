@@ -1,5 +1,7 @@
-from .db import db
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import date, datetime
+
+from .db import db
 from app.weather import get_weather_data
 
 class User(db.Model):
@@ -37,13 +39,24 @@ class User(db.Model):
 	def find_by_username(username):
 		return User.query.filter_by(username = username).first()
 
+	def update(self, data):
+		if 'username' in data:
+			if data['username'] != self.username:
+				user = User.find_by_username(username)
+				if user:
+					print("username already exists")
+					return
+			self.username = data['username']
+		if 'password' in data:
+			self.set_password(data['password'])
+
 class Record(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	date = db.Column(db.String(10), nullable=False)	# 2016-01-01
-	distance = db.Column(db.Integer, nullable=False) # in metres
-	time = db.Column(db.String(8))	# 12:00:00
-	latitude = db.Column(db.Float)
-	longitude = db.Column(db.Float)
+	date = db.Column(db.String(10), nullable=False, default=date.today())	# 2016-01-01
+	distance = db.Column(db.Integer, nullable=False, default=0) # in metres
+	time = db.Column(db.String(8), nullable=False, default=datetime.now().strftime("%H:%M:%S"))	# 12:00:00
+	latitude = db.Column(db.Float, nullable=False, default=-1)	
+	longitude = db.Column(db.Float, nullable=False, default=-1)
 	weather = db.Column(db.String(100))
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -66,6 +79,7 @@ class Record(db.Model):
 				setattr(self, key, data[key])
 		if 'user_id' in data:
 			self.runner = User.query.get(data['user_id']);
+			self.user_id = self.runner.id
 		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.time)
 
 	def to_dict_collection(records):
@@ -76,3 +90,9 @@ class Record(db.Model):
 			'items':[r.to_dict() for r in records]
 		}
 		return data
+
+	def update(self, data):
+		for key in ['date', 'distance', 'time', 'latitude', 'longitude']:
+			if key in data:
+				setattr(self, key, data[key])
+		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.time)
