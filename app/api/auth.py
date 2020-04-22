@@ -11,4 +11,4 @@ class AuthApi(Resource):
 		user = User.find_by_username(username)
 		if user and user.check_password(password):
 			access_token = create_access_token(identity=user.id)
-			return make_response(jsonify(access_token=access_token), 200)
+			return make_response(jsonify(access_token=access_token), 201)

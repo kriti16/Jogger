@@ -3,11 +3,13 @@ from datetime import date, datetime
 
 from .db import db
 from app.weather import get_weather_data
+from app.api.roles import ROLES
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(64), unique=True, nullable=False)
 	password_hash = db.Column(db.String(128), nullable=False)
+	role = db.Column(db.Integer, nullable=False, default=ROLES['user'])
 	records = db.relationship('Record', backref='runner', lazy='dynamic')
 
 	def set_password(self, password):
@@ -19,12 +21,18 @@ class User(db.Model):
 	def to_dict(self):
 		data = {
 			'id': self.id,
-			'username': self.username
+			'username': self.username,
+			'role': self.role
 		}
 		return data
 
 	def from_dict(self, data):
-		setattr(self, 'username', data['username'])
+		if 'username' in data:
+			self.username = data['username']
+		if 'role' in data:
+			self.role = data['role']
+		else:
+			self.role = ROLES['user']
 		self.set_password(data['password'])
 
 	def to_dict_collection(users):
@@ -42,11 +50,13 @@ class User(db.Model):
 	def update(self, data):
 		if 'username' in data:
 			if data['username'] != self.username:
-				user = User.find_by_username(username)
+				user = User.find_by_username(data['username'])
 				if user:
 					print("username already exists")
 					return
+			print('Username updated from %s' %self.username)
 			self.username = data['username']
+			print('to %s' %self.username)
 		if 'password' in data:
 			self.set_password(data['password'])
 
