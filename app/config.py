@@ -10,3 +10,5 @@ class Config(object):
 	WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
 	JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
 	JWT_ACCESS_TOKEN_EXPIRES = False
+	USERS_PER_PAGE = 2
+	RECORDS_PER_PAGE = 2

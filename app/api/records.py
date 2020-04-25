@@ -1,4 +1,4 @@
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, current_app
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -12,7 +12,13 @@ class RecordsApi(Resource):
 	@jwt_required
 	@role_required(ROLES['admin'])
 	def get(self):
-		data = Record.to_dict_collection(Record.query.all())
+		page = request.args.get('page', 1, type=int)
+		records = Record.query.order_by(Record.date.desc(), Record.time.desc()).paginate(page=page, per_page=current_app.config['RECORDS_PER_PAGE'])
+		data = Record.to_dict_collection(records)
+		if records.has_next:
+			data['next_page'] = records.next_num
+		if records.has_prev:
+			data['prev_page'] = records.prev_num
 		return make_response(jsonify(data), 200)
 
 	@jwt_required
@@ -78,9 +84,14 @@ class UserRecordsApi(Resource):
 	@jwt_required
 	def get(self):
 		user = User.query.get(get_jwt_identity())
-		records = user.records.all()
-		print(records)
-		return make_response(jsonify(Record.to_dict_collection(records)), 200)
+		page = request.args.get('page', 1, type=int)
+		records = user.records.order_by(Record.date.desc(), Record.time.desc()).paginate(page=page, per_page=current_app.config['RECORDS_PER_PAGE'])
+		data = Record.to_dict_collection(records)
+		if records.has_next:
+			data['next_page'] = records.next_num
+		if records.has_prev:
+			data['prev_page'] = records.prev_num
+		return make_response(jsonify(data), 200)
 
 	@jwt_required
 	def post(self):

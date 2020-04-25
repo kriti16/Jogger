@@ -7,9 +7,9 @@ from app.api.roles import ROLES
 from tests.base_case import BaseCase
 from flask import jsonify
 
-class putRecordsTest(BaseCase):
+class UpdateRecordsTest(BaseCase):
 
-	def test_put_records_id_by_user(self):
+	def test_update_records_id_by_user(self):
 		with app.app_context():
 			BaseCase.add_user(self)
 			user_id = self.get_user_id('user')
@@ -50,7 +50,7 @@ class putRecordsTest(BaseCase):
 			self.assertEqual("2020-01-20", response.json['date'])
 			self.assertIsNotNone(response.json['weather'])
 
-	def test_put_admin_records_id_by_user(self):
+	def test_update_admin_records_id_by_user(self):
 		with app.app_context():
 			BaseCase.add_admin(self)
 			payload = json.dumps({
@@ -101,7 +101,7 @@ class putRecordsTest(BaseCase):
 			response = self.app.put('/records/%d' %admin_record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(404, response.status_code)
 
-	def test_put_user_id_of_record_by_user(self):
+	def test_update_user_id_of_record_by_user(self):
 		with app.app_context():
 			BaseCase.add_user(self)
 			user_id = self.get_user_id('user')
@@ -139,7 +139,7 @@ class putRecordsTest(BaseCase):
 			response = self.app.put('/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(403, response.status_code)
 
-	def test_put_user_id_of_record_by_admin(self):
+	def test_update_user_id_of_record_by_admin(self):
 		with app.app_context():
 			BaseCase.add_user(self)
 			user_id = self.get_user_id('user')
@@ -179,7 +179,7 @@ class putRecordsTest(BaseCase):
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['user_id'])
 
-	def test_put_wrong_user_id_of_record_by_admin(self):
+	def test_update_wrong_user_id_of_record_by_admin(self):
 		with app.app_context():
 			BaseCase.add_admin(self)
 			admin_id = BaseCase.get_user_id(self, 'admin')

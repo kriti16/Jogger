@@ -7,7 +7,7 @@ from app.api.roles import ROLES
 from tests.base_case import BaseCase
 from flask import jsonify
 
-class ReadRecordsTest(BaseCase):
+class DeleteRecordsTest(BaseCase):
 
 # /records/all
 	def test_delete_records_all_by_none(self):

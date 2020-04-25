@@ -7,7 +7,7 @@ from app.api.roles import ROLES
 from tests.base_case import BaseCase
 from flask import jsonify
 
-class DeleteUsersTest(BaseCase):
+class UpdateUsersTest(BaseCase):
 
 	def test_update_user_id_by_none(self):
 		with app.app_context():

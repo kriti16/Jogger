@@ -39,9 +39,9 @@ class User(db.Model):
 	def to_dict_collection(users):
 		data = {
 			'_meta' : {
-				'total_items' : len(users)
+				'total_items' : len(users.items)
 			},
-			'items':[u.to_dict() for u in users]
+			'items':[u.to_dict() for u in users.items]
 		}
 		return data
 
@@ -106,9 +106,9 @@ class Record(db.Model):
 	def to_dict_collection(records):
 		data = {
 			'_meta' : {
-				'total_items' : len(records)
+				'total_items' : len(records.items)
 			},
-			'items':[r.to_dict() for r in records]
+			'items':[r.to_dict() for r in records.items]
 		}
 		return data
 

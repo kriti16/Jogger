@@ -7,7 +7,7 @@ from app.api.roles import ROLES
 from tests.base_case import BaseCase
 from flask import jsonify
 
-class DeleteRecordsTest(BaseCase):
+class ReadRecordsTest(BaseCase):
 
 # /records/all
 	def test_read_records_all_by_none(self):
@@ -33,7 +33,8 @@ class DeleteRecordsTest(BaseCase):
 			response = self.app.get('/records/all', headers={"Authorization":authorization})
 			self.assertEqual(403, response.status_code)
 
-	def test_read_records_by_admin(self):
+# RECORDS_PER_PAGE = 2
+	def test_pagination_default_read_records_by_admin(self):
 		with app.app_context():
 			BaseCase.add_user(self)
 			user_id = self.get_user_id('user')
@@ -88,6 +89,88 @@ class DeleteRecordsTest(BaseCase):
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['_meta']['total_items'])
 
+# RECORDS_PER_PAGE = 2
+	def test_pagination_read_records_by_admin(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			user_id = self.get_user_id('user')
+			payload = json.dumps({
+				"username": "user",
+				"password": "user"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-01-01",
+				"distance": 1000,
+				"time": "11:30:00",
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+
+			payload = json.dumps({
+				"date": "2020-01-02",
+				"distance": 100,
+				"time": "11:30:00",
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "admin",
+				"password": "admin"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-01-01",
+				"distance": 1000,
+				"time": "11:30:00",
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)			
+
+			response = self.app.get('/records/all', headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(2, response.json['_meta']['total_items'])
+			self.assertTrue(response.json['items'][0]['date'] >= response.json['items'][1]['date'])
+			self.assertTrue('next_page' in response.json)
+			self.assertTrue('prev_page' not in response.json)
+			page = int(response.json['next_page'])
+
+			response = self.app.get('/records/all?page=%d' %page, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(1, response.json['_meta']['total_items'])
+			self.assertTrue('next_page' not in response.json)
+			self.assertTrue('prev_page' in response.json)
+			self.assertEqual(1, response.json['prev_page'])
+
+			page += 1
+			response = self.app.get('/records/all?page=%d' %page, headers={"Authorization":authorization})
+			self.assertEqual(404, response.status_code)
+
 # /records
 	def test_read_records_by_user(self):
 		with app.app_context():
@@ -138,11 +221,50 @@ class DeleteRecordsTest(BaseCase):
 				})
 
 			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
-			self.assertEqual(201, response.status_code)			
+			self.assertEqual(201, response.status_code)		
+			record_1_id = response.json['id']	
+
+			payload = json.dumps({
+				"date": "2020-01-02",
+				"distance": 1000,
+				"time": "11:00:00",
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)		
+			record_2_id = response.json['id']
+
+			payload = json.dumps({
+				"date": "2020-01-01",
+				"distance": 1000,
+				"time": "11:00:00",
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)		
+			record_3_id = response.json['id']	
 
 			response = self.app.get('/records', headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
+			self.assertEqual(2, response.json['_meta']['total_items'])
+			self.assertEqual(record_2_id, response.json['items'][0]['id'])
+			self.assertEqual(record_1_id, response.json['items'][1]['id'])
+			self.assertTrue('next_page' in response.json)
+			page = response.json['next_page']
+
+			response = self.app.get('/records?page=%d' %page, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
+			self.assertEqual(record_3_id, response.json['items'][0]['id'])
+			self.assertTrue('next_page' not in response.json)
+
+			page += 1
+			response = self.app.get('/records?page=%d' %page, headers={"Authorization":authorization})
+			self.assertEqual(404, response.status_code)
 
 	def test_read_records_by_none(self):
 		with app.app_context():
