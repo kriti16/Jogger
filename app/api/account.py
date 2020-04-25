@@ -67,7 +67,6 @@ class UserApi(Resource):
 			return make_response(jsonify(error='PERMISSION_DENIED'), 403)
 		if min_access_level(self, user.role):
 			data = request.get_json() or {}
-			print(data)
 			user.update(data)	
 			db.session.commit()
 			return make_response(jsonify(user.to_dict()), 200)

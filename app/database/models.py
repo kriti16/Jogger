@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, datetime
+from flask_jwt_extended import get_jwt_identity
 
 from .db import db
 from app.weather import get_weather_data
@@ -87,9 +88,19 @@ class Record(db.Model):
 		for key in ['date', 'distance', 'time', 'latitude', 'longitude']:
 			if key in data:
 				setattr(self, key, data[key])
+		user = User.query.get(get_jwt_identity())
 		if 'user_id' in data:
-			self.runner = User.query.get(data['user_id']);
-			self.user_id = self.runner.id
+			if user.role==ROLES['admin'] or data['user_id']==int(get_jwt_identity()):
+				new_user = User.query.get(data['user_id']);
+				if not new_user:
+					raise ValueError('user_id doesn\'t exist') 
+				self.runner = new_user
+			else:
+				print('not admin')
+				raise Exception('User id change not permitted')
+				return 
+		else:
+			self.runner = user
 		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.time)
 
 	def to_dict_collection(records):
@@ -105,4 +116,13 @@ class Record(db.Model):
 		for key in ['date', 'distance', 'time', 'latitude', 'longitude']:
 			if key in data:
 				setattr(self, key, data[key])
+		if 'user_id' in data:
+			user = User.query.get(get_jwt_identity())
+			if user.role==ROLES['admin'] or data['user_id']==int(get_jwt_identity()):
+				new_user = User.query.get(data['user_id']);
+				if not new_user:
+					raise ValueError('user_id doesn\'t exist') 
+				self.runner = new_user
+			else:
+				raise Exception('User id change not permitted')
 		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.time)
