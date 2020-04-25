@@ -14,7 +14,7 @@ class CreateRecordTest(BaseCase):
 			payload = json.dumps({
 				"date": "2020-01-01",
 				"distance": 1000,
-				"time": "11:30:00",
+				"time": 3600,
 				"latitude": 51.5,
 				"longitude": 0.127
 				})
@@ -42,7 +42,7 @@ class CreateRecordTest(BaseCase):
 			payload = json.dumps({
 				"date": "2020-01-01",
 				"distance": 1000,
-				"time": "11:30:00",
+				"time": 3600,
 				"latitude": 51.5,
 				"longitude": 0.127
 				})
@@ -79,7 +79,7 @@ class CreateRecordTest(BaseCase):
 			payload = json.dumps({
 				"date": "2020-01-01",
 				"distance": 1000,
-				"time": "11:30:00",
+				"time": 3600,
 				"latitude": 51.5,
 				"longitude": 0.127,
 				"user_id": manager_id
@@ -109,7 +109,7 @@ class CreateRecordTest(BaseCase):
 			payload = json.dumps({
 				"date": "2020-01-01",
 				"distance": 1000,
-				"time": "11:30:00",
+				"time": 3600,
 				"latitude": 51.5,
 				"longitude": 0.127,
 				"user_id": int(manager_id)
@@ -145,7 +145,7 @@ class CreateRecordTest(BaseCase):
 			payload = json.dumps({
 				"date": "2020-01-01",
 				"distance": 1000,
-				"time": "11:30:00",
+				"time": 3600,
 				"latitude": 51.5,
 				"longitude": 0.127,
 				"user_id": int(admin_id+1)

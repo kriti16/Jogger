@@ -12,3 +12,5 @@ class Config(object):
 	JWT_ACCESS_TOKEN_EXPIRES = False
 	USERS_PER_PAGE = 2
 	RECORDS_PER_PAGE = 2
+	WEEKLY_DAY = 'sun'
+	WEEKLY_HOUR = '10'

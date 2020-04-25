@@ -5,6 +5,7 @@ from flask_jwt_extended import JWTManager
 from app.database.db import init_db
 from app.config import Config
 from app.api.routes import init_routes
+from app.scheduler import init_scheduler
 
 app = Flask(__name__)
 
@@ -15,6 +16,8 @@ app.config.from_object(Config)
 init_db(app)
 
 init_routes(api)
+
+init_scheduler(app)
 
 jwt = JWTManager(app)
 
