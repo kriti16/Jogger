@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail
 
 from app.database.db import init_db
 from app.config import Config
@@ -17,7 +18,8 @@ init_db(app)
 
 init_routes(api)
 
-init_scheduler(app)
+mail = Mail(app)
+init_scheduler(app, mail)
 
 jwt = JWTManager(app)
 
