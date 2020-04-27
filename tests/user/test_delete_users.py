@@ -54,6 +54,29 @@ class DeleteUsersTest(BaseCase):
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['count'])
 
+	def test_delete_filtered_users_by_user_manager(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			BaseCase.add_user_manager(self)
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "manager",
+				"password": "manager"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			q = "role>=1"
+			response = self.app.delete('/users?filter=%s' %q, headers={"Authorization":authorization})
+			
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(1, response.json['count'])
+
 	def test_delete_users_by_admin(self):
 		with app.app_context():
 			BaseCase.add_user(self)
@@ -75,6 +98,29 @@ class DeleteUsersTest(BaseCase):
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(3, response.json['count'])
+
+	def test_delete_filtered_users_by_admin(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			BaseCase.add_user_manager(self)
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "admin",
+				"password": "admin"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			q = "role>=1"
+			response = self.app.delete('/users?filter=%s' %q, headers={"Authorization":authorization})
+			
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(2, response.json['count'])
 
 	def test_delete_user_id_by_none(self):
 		with app.app_context():

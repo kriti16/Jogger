@@ -13,6 +13,7 @@ class User(db.Model):
 	role = db.Column(db.Integer, nullable=False, default=ROLES['user'])
 	records = db.relationship('Record', backref='runner', lazy='dynamic')
 	email = db.relationship('Subscriber', backref='runner', uselist=False)
+	table_schema = 'id, username, role'
 
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
@@ -40,9 +41,9 @@ class User(db.Model):
 	def to_dict_collection(users):
 		data = {
 			'_meta' : {
-				'total_items' : len(users.items)
+				'total_items' : len(users)
 			},
-			'items':[u.to_dict() for u in users.items]
+			'items':[User.to_dict(u) for u in users]
 		}
 		return data
 
@@ -56,9 +57,7 @@ class User(db.Model):
 				if user:
 					print("username already exists")
 					return
-			print('Username updated from %s' %self.username)
 			self.username = data['username']
-			print('to %s' %self.username)
 		if 'password' in data:
 			self.set_password(data['password'])
 
@@ -66,6 +65,7 @@ class Subscriber(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	email = db.Column(db.String(100), nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+	table_schema = 'id, email, user_id'
 
 	def to_dict(self):
 		data = {
@@ -97,6 +97,7 @@ class Record(db.Model):
 	weather = db.Column(db.String(100))
 	entry_time = db.Column(db.String(8), nullable=False, default="12:00:00")	# 12:00:00
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	table_schema = 'id, date, distance, time, latitude, longitude, weather, entry_time, user_id'
 
 	def to_dict(self):
 		data = {
@@ -133,9 +134,9 @@ class Record(db.Model):
 	def to_dict_collection(records):
 		data = {
 			'_meta' : {
-				'total_items' : len(records.items)
+				'total_items' : len(records)
 			},
-			'items':[r.to_dict() for r in records.items]
+			'items':[Record.to_dict(r) for r in records]
 		}
 		return data
 

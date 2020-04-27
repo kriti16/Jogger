@@ -169,7 +169,8 @@ class ReadRecordsTest(BaseCase):
 
 			page += 1
 			response = self.app.get('/records/all?page=%d' %page, headers={"Authorization":authorization})
-			self.assertEqual(404, response.status_code)
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(0, response.json['_meta']['total_items'])
 
 # /records
 	def test_read_records_by_user(self):
@@ -264,7 +265,8 @@ class ReadRecordsTest(BaseCase):
 
 			page += 1
 			response = self.app.get('/records?page=%d' %page, headers={"Authorization":authorization})
-			self.assertEqual(404, response.status_code)
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(0, response.json['_meta']['total_items'])
 
 	def test_read_records_by_none(self):
 		with app.app_context():
@@ -398,3 +400,248 @@ class ReadRecordsTest(BaseCase):
 			response = self.app.get('/records/%d' %user_record_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_record_id, response.json['id'])
+
+	def test_read_filtered_records_by_admin(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			user_id = self.get_user_id('user')
+			payload = json.dumps({
+				"username": "user",
+				"password": "user"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-24",
+				"distance": 1000,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_24 = int(response.json['id'])
+
+			payload = json.dumps({
+				"date": "2020-04-25",
+				"distance": 1500,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_25 = int(response.json['id'])
+
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "admin",
+				"password": "admin"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-01",
+				"distance": 1000,
+				"time": 5000,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)			
+			self.assertIsNotNone(response.json['id'])
+			admin_record_id = int(response.json['id'])
+
+			q = "(time>=5000 or (date>'2020-04-01' and distance>=1500))"
+			response = self.app.get('/records/all?filter=%s' %q, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(2, response.json['_meta']['total_items'])
+			self.assertEqual(record_id_25, response.json['items'][0]['id'])
+			self.assertEqual(admin_record_id, response.json['items'][1]['id'])
+			self.assertTrue('next_page' not in response.json)
+			self.assertTrue('prev_page' not in response.json)
+
+
+	def test_read_filtered_records_by_user(self):
+		with app.app_context():
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "admin",
+				"password": "admin"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-01",
+				"distance": 1000,
+				"time": 5000,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)			
+			self.assertIsNotNone(response.json['id'])
+			admin_record_id = int(response.json['id'])
+
+			BaseCase.add_user(self)
+			user_id = self.get_user_id('user')
+			payload = json.dumps({
+				"username": "user",
+				"password": "user"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-24",
+				"distance": 1000,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_24 = int(response.json['id'])
+
+			payload = json.dumps({
+				"date": "2020-04-25",
+				"distance": 1500,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_25 = int(response.json['id'])
+
+			q = "(time>5000 or (date>'2020-04-01' and distance!=1500))"
+			response = self.app.get('/records?filter=%s' %q, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(1, response.json['_meta']['total_items'])
+			self.assertEqual(record_id_24, response.json['items'][0]['id'])
+			self.assertTrue('next_page' not in response.json)
+			self.assertTrue('prev_page' not in response.json)
+
+	def test_pagination_read_filtered_records_by_admin(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			user_id = self.get_user_id('user')
+			payload = json.dumps({
+				"username": "user",
+				"password": "user"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-24",
+				"distance": 1000,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_24 = int(response.json['id'])
+
+			payload = json.dumps({
+				"date": "2020-04-25",
+				"distance": 1500,
+				"time": 3600,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['id'])
+
+			record_id_25 = int(response.json['id'])
+
+			BaseCase.add_admin(self)
+			payload = json.dumps({
+				"username": "admin",
+				"password": "admin"
+				})
+
+			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(201, response.status_code)
+			self.assertIsNotNone(response.json['access_token'])
+
+			authorization = "Bearer "+ response.json['access_token']
+
+			payload = json.dumps({
+				"date": "2020-04-01",
+				"distance": 1000,
+				"time": 5000,
+				"latitude": 51.5,
+				"longitude": 0.127
+				})
+
+			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			self.assertEqual(201, response.status_code)			
+			self.assertIsNotNone(response.json['id'])
+			admin_record_id = int(response.json['id'])
+
+			q = "time=5000 or date>'2020-04-01' or distance<1500"
+			response = self.app.get('/records/all?filter=%s&page=1' %q, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(2, response.json['_meta']['total_items'])
+			self.assertEqual(record_id_25, response.json['items'][0]['id'])
+			self.assertEqual(record_id_24, response.json['items'][1]['id'])
+			self.assertEqual(2, response.json['next_page'])
+			self.assertTrue('prev_page' not in response.json)
+
+			q = "time=5000 or date>'2020-04-01' or distance<1500"
+			response = self.app.get('/records/all?filter=%s&page=2' %q, headers={"Authorization":authorization})
+			self.assertEqual(200, response.status_code)
+			self.assertEqual(1, response.json['_meta']['total_items'])
+			self.assertEqual(admin_record_id, response.json['items'][0]['id'])
+			self.assertTrue('next_page' not in response.json)
+			self.assertEqual(1, response.json['prev_page'])
