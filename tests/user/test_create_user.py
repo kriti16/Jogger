@@ -17,7 +17,7 @@ class CreateUserTest(BaseCase):
 				"role": ROLES['user']
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertEqual("test", response.json['username'])
@@ -31,7 +31,7 @@ class CreateUserTest(BaseCase):
 				"role": ROLES['user_manager']
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(403, response.status_code)
 
@@ -43,7 +43,7 @@ class CreateUserTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -56,7 +56,7 @@ class CreateUserTest(BaseCase):
 				"role": ROLES['user_manager']
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertEqual("test", response.json['username'])
 			self.assertEqual(ROLES['user_manager'], response.json['role'])
@@ -71,7 +71,7 @@ class CreateUserTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -84,7 +84,7 @@ class CreateUserTest(BaseCase):
 				"role": ROLES['user_manager']
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertEqual("test", response.json['username'])
 			self.assertEqual(ROLES['user_manager'], response.json['role'])
@@ -99,7 +99,7 @@ class CreateUserTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -112,5 +112,5 @@ class CreateUserTest(BaseCase):
 				"role": ROLES['admin']
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(403, response.status_code)

@@ -19,7 +19,7 @@ class CreateRecordTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(401, response.status_code)
 
@@ -32,7 +32,7 @@ class CreateRecordTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -47,7 +47,7 @@ class CreateRecordTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertEqual("2020-01-01", response.json['date'])
 			self.assertEqual(1000, response.json['distance'])
@@ -69,7 +69,7 @@ class CreateRecordTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -85,7 +85,7 @@ class CreateRecordTest(BaseCase):
 				"user_id": manager_id
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(403, response.status_code)	
 
 	def test_create_record_by_admin_change_user_id(self):
@@ -99,7 +99,7 @@ class CreateRecordTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -115,7 +115,7 @@ class CreateRecordTest(BaseCase):
 				"user_id": int(manager_id)
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertEqual("2020-01-01", response.json['date'])
 			self.assertEqual(1000, response.json['distance'])
@@ -135,7 +135,7 @@ class CreateRecordTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -151,5 +151,5 @@ class CreateRecordTest(BaseCase):
 				"user_id": int(admin_id+1)
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(404, response.status_code)

@@ -11,7 +11,7 @@ class ReadUsersTest(BaseCase):
 
 	def test_read_users_by_none(self):
 		with app.app_context():
-			response = self.app.get('/users')
+			response = self.app.get('/api/users')
 			self.assertEqual(401, response.status_code)
 
 	def test_read_users_by_user(self):
@@ -22,14 +22,14 @@ class ReadUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users', headers={"Authorization":authorization})
+			response = self.app.get('/api/users', headers={"Authorization":authorization})
 			self.assertEqual(403, response.status_code)
 
 	def test_read_users_by_user_manager(self):
@@ -41,14 +41,14 @@ class ReadUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users', headers={"Authorization":authorization})
+			response = self.app.get('/api/users', headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['_meta']['total_items'])
@@ -62,7 +62,7 @@ class ReadUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -70,7 +70,7 @@ class ReadUsersTest(BaseCase):
 			authorization = "Bearer "+ response.json['access_token']
 
 			q = "role=1"
-			response = self.app.get('/users?filter=%s' %q, headers={"Authorization":authorization})
+			response = self.app.get('/api/users?filter=%s' %q, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
@@ -85,7 +85,7 @@ class ReadUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -93,7 +93,7 @@ class ReadUsersTest(BaseCase):
 			authorization = "Bearer "+ response.json['access_token']
 
 			q = "role>0"
-			response = self.app.get('/users?filter=%s' %q, headers={"Authorization":authorization})
+			response = self.app.get('/api/users?filter=%s' %q, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
@@ -101,7 +101,7 @@ class ReadUsersTest(BaseCase):
 	def test_read_user_id_by_none(self):
 		with app.app_context():
 			BaseCase.add_user(self)
-			response = self.app.get('/users/1')
+			response = self.app.get('/api/users/1')
 			self.assertEqual(401, response.status_code)
 
 	def test_read_user_id_by_user(self):
@@ -115,14 +115,14 @@ class ReadUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users/%d' %manager_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %manager_id, headers={"Authorization":authorization})
 			self.assertEqual(403, response.status_code)
 
 	def test_read_user_id_self_by_user(self):
@@ -134,14 +134,14 @@ class ReadUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
 			self.assertEqual('user', response.json['username'])
@@ -156,14 +156,14 @@ class ReadUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
@@ -181,20 +181,20 @@ class ReadUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
 			self.assertEqual('user', response.json['username'])
 
-			response = self.app.get('/users/%d' %manager_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %manager_id, headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(manager_id, response.json['id'])
@@ -213,14 +213,14 @@ class ReadUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users?page=1', headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=1', headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['_meta']['total_items'])
@@ -230,7 +230,7 @@ class ReadUsersTest(BaseCase):
 			self.assertTrue('prev_page' not in response.json)
 			page = int(response.json['next_page'])
 
-			response = self.app.get('/users?page=%d' %page, headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=%d' %page, headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
@@ -240,7 +240,7 @@ class ReadUsersTest(BaseCase):
 			self.assertEqual(1, response.json['prev_page'])
 
 			page += 1
-			response = self.app.get('/users?page=%d' %page, headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=%d' %page, headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(0, response.json['_meta']['total_items'])
@@ -256,7 +256,7 @@ class ReadUsersTest(BaseCase):
 				"password": "test2"
 				})
 
-			response = self.app.post('/users', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/users', headers={"Content-Type": "application/json"}, data=payload)
 			self.assertEqual(201, response.status_code)
 
 			BaseCase.add_user_manager(self)
@@ -267,14 +267,14 @@ class ReadUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.get('/users?page=1', headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=1', headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['_meta']['total_items'])
@@ -284,7 +284,7 @@ class ReadUsersTest(BaseCase):
 			self.assertTrue('prev_page' not in response.json)
 
 			q = "role!=2"
-			response = self.app.get('/users?page=2&filter=%s' %q, headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=2&filter=%s' %q, headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
@@ -294,7 +294,7 @@ class ReadUsersTest(BaseCase):
 			self.assertEqual(1, response.json['prev_page'])
 
 			page = 3
-			response = self.app.get('/users?page=%d&filter=%s' %(page,q), headers={"Authorization":authorization})
+			response = self.app.get('/api/users?page=%d&filter=%s' %(page,q), headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(0, response.json['_meta']['total_items'])

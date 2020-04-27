@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from flask_mail import Message
 
-from app.database.models import User, Record, Subscriber
+from app.database.models import User, Record
 
 def send_email(mail, subject, sender, recipient, text_body):
     msg = Message(subject, sender=sender, recipients=[recipient])
@@ -10,12 +10,13 @@ def send_email(mail, subject, sender, recipient, text_body):
 
 def generate_weekly_report(app, mail):
 	with app.app_context():
-		subscribers = Subscriber.query.all()
+		subscribers = User.query.filter_by(subscriber=True)
 		start_date = date.today() - timedelta(days=7) 
 		print('Generating weekly report')
 		for s in subscribers:
-			user = s.runner
-			records = user.records.filter(Record.date > start_date)
+			records = s.records.filter(Record.date > start_date)
+			if records.count() == 0:
+				continue
 			sum_distance = sum(r.distance for r in records)
 			sum_time = sum(r.time for r in records)
 			avg_distance = sum_distance/records.count()

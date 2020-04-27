@@ -18,7 +18,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -33,7 +33,7 @@ class UpdateRecordsTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)			
 			self.assertIsNotNone(response.json['id'])
 			record_id = int(response.json['id'])
@@ -43,7 +43,7 @@ class UpdateRecordsTest(BaseCase):
 				"distance": 100
 				})			
 
-			response = self.app.put('/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(record_id, response.json['id'])
 			self.assertEqual(100, response.json['distance'])
@@ -58,7 +58,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -73,7 +73,7 @@ class UpdateRecordsTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['id'])
 
@@ -86,7 +86,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -98,7 +98,7 @@ class UpdateRecordsTest(BaseCase):
 				"distance": 100
 				})	
 
-			response = self.app.put('/records/%d' %admin_record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/records/%d' %admin_record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(404, response.status_code)
 
 	def test_update_user_id_of_record_by_user(self):
@@ -110,7 +110,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -125,7 +125,7 @@ class UpdateRecordsTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)			
 			self.assertIsNotNone(response.json['id'])
 			record_id = int(response.json['id'])
@@ -136,7 +136,7 @@ class UpdateRecordsTest(BaseCase):
 				"user_id": user_id+1
 				})			
 
-			response = self.app.put('/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(403, response.status_code)
 
 	def test_update_user_id_of_record_by_admin(self):
@@ -150,7 +150,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -165,7 +165,7 @@ class UpdateRecordsTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['id'])
 
@@ -175,7 +175,7 @@ class UpdateRecordsTest(BaseCase):
 				"user_id": user_id
 				})	
 
-			response = self.app.put('/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['user_id'])
 
@@ -188,7 +188,7 @@ class UpdateRecordsTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -203,7 +203,7 @@ class UpdateRecordsTest(BaseCase):
 				"longitude": 0.127
 				})
 
-			response = self.app.post('/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.post('/api/records', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['id'])
 
@@ -213,5 +213,5 @@ class UpdateRecordsTest(BaseCase):
 				"user_id": admin_id + 1
 				})	
 
-			response = self.app.put('/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/records/%d' %record_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(404, response.status_code)

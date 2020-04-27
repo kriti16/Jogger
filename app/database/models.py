@@ -8,12 +8,15 @@ from app.api.roles import ROLES
 
 class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	
 	username = db.Column(db.String(64), unique=True, nullable=False)
 	password_hash = db.Column(db.String(128), nullable=False)
-	role = db.Column(db.Integer, nullable=False, default=ROLES['user'])
+	role = db.Column(db.Integer, nullable=False, default=ROLES['user'])	
+	email = db.Column(db.String(320), nullable=False, unique=True)
+	subscriber = db.Column(db.Boolean, nullable=False, default=True)
+
 	records = db.relationship('Record', backref='runner', lazy='dynamic')
-	email = db.relationship('Subscriber', backref='runner', uselist=False)
-	table_schema = 'id, username, role'
+	table_schema = 'id, username, role, email, subscriber'
 
 	def set_password(self, password):
 		self.password_hash = generate_password_hash(password)
@@ -25,13 +28,16 @@ class User(db.Model):
 		data = {
 			'id': self.id,
 			'username': self.username,
-			'role': self.role
+			'role': self.role,
+			'email': self.email,
+			'subscriber': self.subscriber
 		}
 		return data
 
 	def from_dict(self, data):
-		if 'username' in data:
-			self.username = data['username']
+		for key in ['username', 'email', 'subscriber']:
+			if key in data:
+				setattr(self, key, data[key])
 		if 'role' in data:
 			self.role = data['role']
 		else:
@@ -61,39 +67,13 @@ class User(db.Model):
 		if 'password' in data:
 			self.set_password(data['password'])
 
-class Subscriber(db.Model):
-	id = db.Column(db.Integer, primary_key=True)
-	email = db.Column(db.String(100), nullable=False)
-	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
-	table_schema = 'id, email, user_id'
-
-	def to_dict(self):
-		data = {
-			'id': self.id,
-			'email': self.email,
-			'user_id': self.user_id,
-			'username':self.runner.username
-		}
-		return data
-
-	def from_dict(self, data):
-		if 'email' not in data:
-			raise ValueError('email required')
-		self.email = data['email']
-		user = User.query.get(get_jwt_identity())
-		self.runner = user
-
-	def update(self, data):
-		if 'email' in data:
-			self.email = data['email']
-
 class Record(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	date = db.Column(db.String(10), nullable=False, default=date.today())	# 2016-01-01
 	distance = db.Column(db.Integer, nullable=False, default=0) # in metres
 	time = db.Column(db.Integer, nullable=False, default=1)	# 12:00:00
 	latitude = db.Column(db.Float, nullable=False, default=-1)	
-	longitude = db.Column(db.Float, nullable=False, default=-1)
+	longitude = db.Column(db.Float, nullable=False, default=-1)	
 	weather = db.Column(db.String(100))
 	entry_time = db.Column(db.String(8), nullable=False, default="12:00:00")	# 12:00:00
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

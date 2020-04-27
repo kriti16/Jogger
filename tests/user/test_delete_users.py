@@ -11,7 +11,7 @@ class DeleteUsersTest(BaseCase):
 
 	def test_delete_users_by_none(self):
 		with app.app_context():
-			response = self.app.delete('/users')
+			response = self.app.delete('/api/users')
 			self.assertEqual(401, response.status_code)
 
 	def test_delete_users_by_user(self):
@@ -22,14 +22,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users', headers={"Authorization":authorization})
+			response = self.app.delete('/api/users', headers={"Authorization":authorization})
 			self.assertEqual(403, response.status_code)
 
 	def test_delete_users_by_user_manager(self):
@@ -42,14 +42,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users', headers={"Authorization":authorization})
+			response = self.app.delete('/api/users', headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['count'])
@@ -64,7 +64,7 @@ class DeleteUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -72,7 +72,7 @@ class DeleteUsersTest(BaseCase):
 			authorization = "Bearer "+ response.json['access_token']
 
 			q = "role>=1"
-			response = self.app.delete('/users?filter=%s' %q, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users?filter=%s' %q, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['count'])
@@ -87,14 +87,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users', headers={"Authorization":authorization})
+			response = self.app.delete('/api/users', headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(3, response.json['count'])
@@ -109,7 +109,7 @@ class DeleteUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -117,7 +117,7 @@ class DeleteUsersTest(BaseCase):
 			authorization = "Bearer "+ response.json['access_token']
 
 			q = "role>=1"
-			response = self.app.delete('/users?filter=%s' %q, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users?filter=%s' %q, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['count'])
@@ -125,7 +125,7 @@ class DeleteUsersTest(BaseCase):
 	def test_delete_user_id_by_none(self):
 		with app.app_context():
 			BaseCase.add_user(self)
-			response = self.app.delete('/users/1')
+			response = self.app.delete('/api/users/1')
 			self.assertEqual(401, response.status_code)
 
 	def test_delete_user_id_by_user(self):
@@ -139,14 +139,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users/%d' %manager_id, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users/%d' %manager_id, headers={"Authorization":authorization})
 			self.assertEqual(403, response.status_code)
 
 	def test_delete_user_id_self_by_user(self):
@@ -158,14 +158,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
 			self.assertEqual('user', response.json['username'])
@@ -180,14 +180,14 @@ class DeleteUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
@@ -205,25 +205,25 @@ class DeleteUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
 
 			authorization = "Bearer "+ response.json['access_token']
 
-			response = self.app.delete('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users/%d' %user_id, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
 			self.assertEqual('user', response.json['username'])
 
-			response = self.app.delete('/users/%d' %manager_id, headers={"Authorization":authorization})
+			response = self.app.delete('/api/users/%d' %manager_id, headers={"Authorization":authorization})
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(manager_id, response.json['id'])
 			self.assertEqual('manager', response.json['username'])
 
-			response = self.app.get('/users/%d' %user_id, headers={"Authorization":authorization})
+			response = self.app.get('/api/users/%d' %user_id, headers={"Authorization":authorization})
 
 			self.assertEqual(404, response.status_code)

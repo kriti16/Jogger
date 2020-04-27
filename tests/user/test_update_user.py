@@ -12,7 +12,7 @@ class UpdateUsersTest(BaseCase):
 	def test_update_user_id_by_none(self):
 		with app.app_context():
 			BaseCase.add_user(self)
-			response = self.app.put('/users/1')
+			response = self.app.put('/api/users/1')
 			self.assertEqual(401, response.status_code)
 
 	def test_update_user_id_by_user(self):
@@ -26,7 +26,7 @@ class UpdateUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -36,7 +36,7 @@ class UpdateUsersTest(BaseCase):
 			payload = json.dumps({
 				"username": "new_user"
 				})
-			response = self.app.put('/users/%d' %manager_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/users/%d' %manager_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(403, response.status_code)
 
 	def test_update_user_id_self_by_user(self):
@@ -48,7 +48,7 @@ class UpdateUsersTest(BaseCase):
 				"password": "user"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -58,7 +58,7 @@ class UpdateUsersTest(BaseCase):
 			payload = json.dumps({
 				"username": "new_user"
 				})
-			response = self.app.put('/users/%d' %user_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/users/%d' %user_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
@@ -74,7 +74,7 @@ class UpdateUsersTest(BaseCase):
 				"password": "manager"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -85,7 +85,7 @@ class UpdateUsersTest(BaseCase):
 				"username": "new_user"
 				})
 
-			response = self.app.put('/users/%d' %user_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/users/%d' %user_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(user_id, response.json['id'])
@@ -101,7 +101,7 @@ class UpdateUsersTest(BaseCase):
 				"password": "admin"
 				})
 
-			response = self.app.post('/auth', headers={"Content-Type": "application/json"}, data=payload)
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(201, response.status_code)
 			self.assertIsNotNone(response.json['access_token'])
@@ -112,13 +112,13 @@ class UpdateUsersTest(BaseCase):
 				"username": "new_manager"
 				})
 
-			response = self.app.put('/users/%d' %manager_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
+			response = self.app.put('/api/users/%d' %manager_id, headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(manager_id, response.json['id'])
 			self.assertEqual('new_manager', response.json['username'])
 
-			reponse = self.app.get('/users/%d' %manager_id, headers={"Authorization":authorization})
+			reponse = self.app.get('/api/users/%d' %manager_id, headers={"Authorization":authorization})
 			
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(manager_id, response.json['id'])

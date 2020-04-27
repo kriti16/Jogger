@@ -21,21 +21,21 @@ class BaseCase(unittest.TestCase):
 
 	def add_admin(self):
 		with app.app_context():
-			u = User(username='admin', role=ROLES['admin'])
+			u = User(username='admin', role=ROLES['admin'], email='admin@example.com')
 			u.set_password('admin')
 			db.session.add(u)
 			db.session.commit()		
 
 	def add_user_manager(self):
 		with app.app_context():
-			u = User(username='manager', role=ROLES['user_manager'])
+			u = User(username='manager', role=ROLES['user_manager'], email='user_manager@example.com')
 			u.set_password('manager')
 			db.session.add(u)
 			db.session.commit()	
 
 	def add_user(self):
 		with app.app_context():
-			u = User(username='user', role=ROLES['user'])
+			u = User(username='user', role=ROLES['user'], email='user@example.com')
 			u.set_password('user')
 			db.session.add(u)
 			db.session.commit()
