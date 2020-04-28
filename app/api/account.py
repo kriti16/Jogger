@@ -193,6 +193,7 @@ class UserApi(Resource):
 			return error_response('USER NOT FOUND', 404)
 		if int(id)!=int(get_jwt_identity()) and (current_user.role<user.role or current_user.role==ROLES['user']):
 			return error_response('PERMISSION DENIED', 403)
+
 		db.session.delete(user)
 		db.session.commit()
 		return make_response(jsonify(count=1), 200)

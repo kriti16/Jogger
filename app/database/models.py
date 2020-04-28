@@ -15,7 +15,7 @@ class User(db.Model):
 	email = db.Column(db.String(320), nullable=False, unique=True)
 	subscriber = db.Column(db.Boolean, nullable=False, default=True)
 
-	records = db.relationship('Record', backref='runner', lazy='dynamic')
+	records = db.relationship('Record', backref='runner', lazy='dynamic', cascade="all,delete")
 	table_schema = 'id, username, role, email, subscriber'
 
 	def set_password(self, password):
