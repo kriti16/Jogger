@@ -35,19 +35,26 @@ class User(db.Model):
 		return data
 
 	def from_dict(self, data):
-		for key in ['username', 'email', 'subscriber']:
-			if key in data:
-				setattr(self, key, data[key])
-		if 'role' in data:
-			self.role = data['role']
-		else:
-			self.role = ROLES['user']
-		self.set_password(data['password'])
+		if 'username' in data:
+			user = User.find_by_username(data['username'])
+			if user:
+				raise Exception("username already exist")
+			self.username = data['username']
+		if 'password' in data:
+			self.set_password(data['password'])
+		if 'email' in data:
+			user = User.find_by_email(data['email'])
+			if user:
+				raise Exception("Email already exist")
+			self.email = data['email']
 
-	def to_dict_collection(users):
+	def to_dict_collection(users, page, per_page, total_pages):
 		data = {
 			'_meta' : {
-				'total_items' : len(users)
+				'total_items' : len(users),
+				'total_pages' : total_pages,
+				'page' : page,
+				'per_page' : per_page
 			},
 			'items':[User.to_dict(u) for u in users]
 		}
@@ -56,16 +63,25 @@ class User(db.Model):
 	def find_by_username(username):
 		return User.query.filter_by(username = username).first()
 
+	def find_by_email(email):
+		return User.query.filter_by(email = email).first()
+
 	def update(self, data):
 		if 'username' in data:
 			if data['username'] != self.username:
 				user = User.find_by_username(data['username'])
 				if user:
-					print("username already exists")
-					return
+					raise Exception("username already exist")
 			self.username = data['username']
 		if 'password' in data:
 			self.set_password(data['password'])
+		current_user = User.query.get(get_jwt_identity())
+		if 'email' in data:
+			if data['email'] != self.email:
+				user = User.find_by_email(data['email'])
+				if user:
+					raise Exception("Email already exist")
+			self.email = data['email']
 
 class Record(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -101,20 +117,22 @@ class Record(db.Model):
 			if user.role==ROLES['admin'] or data['user_id']==int(get_jwt_identity()):
 				new_user = User.query.get(data['user_id']);
 				if not new_user:
-					raise ValueError('user_id doesn\'t exist') 
+					raise ValueError('user_id does not exist') 
 				self.runner = new_user
 			else:
 				raise Exception('User id change not permitted')
-				return 
 		else:
 			self.runner = user
 		self.entry_time = datetime.now().strftime("%H:%M:%S")
 		self.weather = get_weather_data(self.latitude, self.longitude, self.date, self.entry_time)
 
-	def to_dict_collection(records):
+	def to_dict_collection(records, page, per_page, total_pages):
 		data = {
 			'_meta' : {
-				'total_items' : len(records)
+				'total_items' : len(records),
+				'total_pages' : total_pages,
+				'page' : page,
+				'per_page' : per_page
 			},
 			'items':[Record.to_dict(r) for r in records]
 		}
@@ -129,7 +147,7 @@ class Record(db.Model):
 			if user.role==ROLES['admin'] or data['user_id']==int(get_jwt_identity()):
 				new_user = User.query.get(data['user_id']);
 				if not new_user:
-					raise ValueError('user_id doesn\'t exist') 
+					raise ValueError('user_id does not exist') 
 				self.runner = new_user
 			else:
 				raise Exception('User id change not permitted')

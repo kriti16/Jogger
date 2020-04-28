@@ -13,7 +13,7 @@ class ReadRecordsTest(BaseCase):
 	def test_read_records_all_by_none(self):
 		with app.app_context():
 			response = self.app.get('/api/records/all')
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 	def test_read_records_all_by_user(self):
 		with app.app_context():
@@ -271,7 +271,7 @@ class ReadRecordsTest(BaseCase):
 	def test_read_records_by_none(self):
 		with app.app_context():
 			response = self.app.get('/api/records')
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 # /records/<id>
 	def test_read_records_id_by_user(self):
@@ -633,15 +633,17 @@ class ReadRecordsTest(BaseCase):
 			response = self.app.get('/api/records/all?filter=%s&page=1' %q, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(2, response.json['_meta']['total_items'])
+			self.assertEqual(2, response.json['_meta']['total_pages'])
 			self.assertEqual(record_id_25, response.json['items'][0]['id'])
 			self.assertEqual(record_id_24, response.json['items'][1]['id'])
 			self.assertEqual(2, response.json['next_page'])
 			self.assertTrue('prev_page' not in response.json)
 
 			q = "time=5000 or date>'2020-04-01' or distance<1500"
-			response = self.app.get('/api/records/all?filter=%s&page=2' %q, headers={"Authorization":authorization})
+			response = self.app.get('/api/records/all?filter=%s&page=2&per_page=1' %q, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
 			self.assertEqual(1, response.json['_meta']['total_items'])
-			self.assertEqual(admin_record_id, response.json['items'][0]['id'])
-			self.assertTrue('next_page' not in response.json)
+			self.assertEqual(3, response.json['_meta']['total_pages'])
+			self.assertEqual(record_id_24, response.json['items'][0]['id'])
+			self.assertTrue(3, response.json['next_page'])
 			self.assertEqual(1, response.json['prev_page'])

@@ -13,7 +13,7 @@ class DeleteRecordsTest(BaseCase):
 	def test_delete_records_all_by_none(self):
 		with app.app_context():
 			response = self.app.delete('/api/records/all')
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 	def test_delete_records_all_by_user(self):
 		with app.app_context():
@@ -151,7 +151,7 @@ class DeleteRecordsTest(BaseCase):
 	def test_delete_records_by_none(self):
 		with app.app_context():
 			response = self.app.delete('/api/records')
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 # /records/<id>
 	def test_delete_records_id_by_user(self):
@@ -212,7 +212,7 @@ class DeleteRecordsTest(BaseCase):
 
 			response = self.app.delete('/api/records/%d' %record_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
-			self.assertEqual(record_id, response.json['id'])
+			self.assertEqual(1, response.json['count'])
 
 			response = self.app.get('/api/records/%d' %record_id, headers={"Authorization":authorization})
 			self.assertEqual(404, response.status_code)
@@ -278,11 +278,11 @@ class DeleteRecordsTest(BaseCase):
 
 			response = self.app.delete('/api/records/%d' %record_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
-			self.assertEqual(record_id, response.json['id'])
+			self.assertEqual(1, response.json['count'])
 
 			response = self.app.delete('/api/records/%d' %user_record_id, headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)
-			self.assertEqual(user_record_id, response.json['id'])
+			self.assertEqual(1, response.json['count'])
 
 			response = self.app.get('/api/records/all', headers={"Authorization":authorization})
 			self.assertEqual(200, response.status_code)

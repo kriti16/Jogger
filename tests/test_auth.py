@@ -31,3 +31,26 @@ class UserAuthTest(BaseCase):
 			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
 
 			self.assertEqual(401, response.status_code)
+
+	def test_auth_validation(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			payload = json.dumps({
+				"username": "user"
+				})
+
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(400, response.status_code)
+
+	def test_auth_validation_int_password(self):
+		with app.app_context():
+			BaseCase.add_user(self)
+			payload = json.dumps({
+				"username": "user",
+				"password":1
+				})
+
+			response = self.app.post('/api/auth', headers={"Content-Type": "application/json"}, data=payload)
+
+			self.assertEqual(400, response.status_code)

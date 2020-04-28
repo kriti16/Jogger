@@ -8,10 +8,10 @@ from tests.base_case import BaseCase
 
 class SubscriptionTest(BaseCase):
 
-	def test_subscribe_by_none(self):
+	def test_subscribe_without_auth(self):
 		with app.app_context():
 			response = self.app.post('/api/subscribe', headers={"Content-Type": "application/json"})
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 	def test_subscribe_by_user(self):
 		with app.app_context():
@@ -30,7 +30,7 @@ class SubscriptionTest(BaseCase):
 			authorization = "Bearer "+ response.json['access_token']
 			response = self.app.post('/api/subscribe', headers={"Content-Type": "application/json", "Authorization":authorization})
 			self.assertEqual(201, response.status_code)
-			self.assertEqual('Already a subscriber', response.json['msg'])
+			self.assertEqual('Already a subscriber', response.json['message'])
 
 	def test_unsubscribe_by_user(self):
 		with app.app_context():
@@ -50,11 +50,11 @@ class SubscriptionTest(BaseCase):
 
 			response = self.app.post('/api/unsubscribe', headers={"Content-Type": "application/json", "Authorization":authorization}, data=payload)
 			self.assertEqual(201, response.status_code)
-			self.assertEqual('Unsubscribed successfully', response.json['msg'])
+			self.assertEqual('Unsubscribed successfully', response.json['message'])
 
 			response = self.app.post('/api/subscribe', headers={"Authorization":authorization})
 			self.assertEqual(201, response.status_code)
-			self.assertEqual('Subscribed successfully', response.json['msg'])
+			self.assertEqual('Subscribed successfully', response.json['message'])
 
 	def test_unsubscribe_by_non_subscriber(self):
 		with app.app_context():
@@ -74,8 +74,8 @@ class SubscriptionTest(BaseCase):
 
 			response = self.app.post('/api/unsubscribe', headers={"Authorization":authorization})
 			self.assertEqual(201, response.status_code)
-			self.assertEqual('Unsubscribed successfully', response.json['msg'])
+			self.assertEqual('Unsubscribed successfully', response.json['message'])
 
 			response = self.app.post('/api/unsubscribe', headers={"Authorization":authorization})
 			self.assertEqual(201, response.status_code)
-			self.assertEqual('Not a subscriber', response.json['msg'])
+			self.assertEqual('Not a subscriber', response.json['message'])

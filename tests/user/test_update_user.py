@@ -7,13 +7,13 @@ from app.api.roles import ROLES
 from tests.base_case import BaseCase
 from flask import jsonify
 
-class UpdateUsersTest(BaseCase):
+class UpdateUserTest(BaseCase):
 
 	def test_update_user_id_by_none(self):
 		with app.app_context():
 			BaseCase.add_user(self)
 			response = self.app.put('/api/users/1')
-			self.assertEqual(401, response.status_code)
+			self.assertEqual(400, response.status_code)
 
 	def test_update_user_id_by_user(self):
 		with app.app_context():
